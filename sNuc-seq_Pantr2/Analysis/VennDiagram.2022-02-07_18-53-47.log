@@ -1,0 +1,10 @@
+INFO [2022-02-07 18:53:47] $x
+INFO [2022-02-07 18:53:47] list(diff_genes$gene_short_name, unique(diff_genes_cluster$gene_short_name))
+INFO [2022-02-07 18:53:47] 
+INFO [2022-02-07 18:53:47] $filename
+INFO [2022-02-07 18:53:47] NULL
+INFO [2022-02-07 18:53:47] 
+INFO [2022-02-07 18:53:47] $output
+INFO [2022-02-07 18:53:47] T
+INFO [2022-02-07 18:53:47] 
+ERROR [2022-02-07 18:53:47] Unexpected parameter length for "category"

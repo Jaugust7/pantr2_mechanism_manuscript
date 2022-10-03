@@ -1,0 +1,978 @@
+---
+title: "sNuc-seq_Pantr2_preprocessing"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(monocle3)
+library(Matrix)
+library(textTinyR)
+library(scds)
+library(diem)
+library(gridExtra)
+library(tricycle)
+library(pals)
+library(cowplot)
+library(clusterProfiler)
+library(multienrichjam)
+library(org.Mm.eg.db)
+library(knitr)
+library(kableExtra)
+library(ComplexHeatmap)
+library(circlize)
+library(VennDiagram)
+library(miloR)
+library(scater)
+library(patchwork)
+library(scran)
+library(UpSetR)
+library(SingleCellExperiment)
+```
+
+```{r}
+CY1<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY1/counts_filtered/spliced_plus_unspliced.mtx")
+CY1_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY1/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CY1_barcodes<-paste0("CY1:",CY1_barcodes$V1)
+colnames(CY1)<-CY1_barcodes
+CY1_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY1/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CY1)<-CY1_genes$V1
+
+CY2<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY2/counts_filtered/spliced_plus_unspliced.mtx")
+CY2_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY2/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CY2_barcodes<-paste0("CY2:",CY2_barcodes$V1)
+colnames(CY2)<-CY2_barcodes
+CY2_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY2/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CY2)<-CY2_genes$V1
+
+CY3<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY3/counts_filtered/spliced_plus_unspliced.mtx")
+CY3_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY3/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CY3_barcodes<-paste0("CY3:",CY3_barcodes$V1)
+colnames(CY3)<-CY3_barcodes
+CY3_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY3/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CY3)<-CY3_genes$V1
+
+CY4<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY4/counts_filtered/spliced_plus_unspliced.mtx")
+CY4_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY4/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CY4_barcodes<-paste0("CY4:",CY4_barcodes$V1)
+colnames(CY4)<-CY4_barcodes
+CY4_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CY4/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CY4)<-CY4_genes$V1
+
+CZ1<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ1/counts_filtered/spliced_plus_unspliced.mtx")
+CZ1_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ1/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CZ1_barcodes<-paste0("CZ1:",CZ1_barcodes$V1)
+colnames(CZ1)<-CZ1_barcodes
+CZ1_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ1/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CZ1)<-CZ1_genes$V1
+
+CZ2<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ2/counts_filtered/spliced_plus_unspliced.mtx")
+CZ2_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ2/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CZ2_barcodes<-paste0("CZ2:",CZ2_barcodes$V1)
+colnames(CZ2)<-CZ2_barcodes
+CZ2_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ2/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CZ2)<-CZ2_genes$V1
+
+CZ3<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ3/counts_filtered/spliced_plus_unspliced.mtx")
+CZ3_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ3/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CZ3_barcodes<-paste0("CZ3:",CZ3_barcodes$V1)
+colnames(CZ3)<-CZ3_barcodes
+CZ3_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ3/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CZ3)<-CZ3_genes$V1
+
+CZ4<-readMM("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ4/counts_filtered/spliced_plus_unspliced.mtx")
+CZ4_barcodes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ4/counts_filtered/spliced_plus_unspliced.barcodes.txt", header = F)
+CZ4_barcodes<-paste0("CZ4:",CZ4_barcodes$V1)
+colnames(CZ4)<-CZ4_barcodes
+CZ4_genes<-read.delim("~/../../mnt/morbo/Data/Users/jaugustin/Pantr2_snRNASeq/results/kallisto_out/CZ4/counts_filtered/spliced_plus_unspliced.genes.txt", header = F)
+rownames(CZ4)<-CZ4_genes$V1
+
+exprs<-cbind(CY1, CY2, CY3, CY4, CZ1, CZ2, CZ3, CZ4)
+
+pheno<-data.frame(barcode = colnames(exprs), genotype=rep("empty"))
+rownames(pheno)<-pheno$barcode
+pheno$cell_id<-sub(":.*", "", pheno$barcode) 
+pheno$genotype<-ifelse(pheno$cell_id %in% c("CY1", "CY2", "CY3", "CY4"), "P2KO", "WT")
+pheno$age<-rep("E15.5")
+pheno$tissue<-rep("dorsal_telencephalon")
+pheno$library_date<-rep("10/5/21")
+
+mart <- biomaRt::useEnsembl(biomart = "ensembl",
+                   dataset = "mmusculus_gene_ensembl",
+                   mirror = "uswest"
+                   )
+
+t2g <- biomaRt::getBM(attributes = c("ensembl_gene_id",
+                                     "external_gene_name",
+                                     "chromosome_name",
+                                     "start_position",
+                                     "end_position"), 
+                                      mart = mart,
+                                      verbose=T) 
+
+genes<-as.data.frame(str_split_fixed(rownames(exprs),pattern = "\\.",2)[,1]) 
+colnames(genes)<-"ensembl_gene_id"
+tmp<-dplyr::left_join(genes,t2g,by=c("ensembl_gene_id" = "ensembl_gene_id"),sort=FALSE,all.x=TRUE,keep=TRUE)
+rownames(tmp)<-rownames(exprs)
+features<-tmp
+colnames(features)[3]<-"gene_short_name"
+
+dat<-new_cell_data_set(exprs, pheno, features)
+rm(list=setdiff(ls(), "dat"))
+```
+
+```{r}
+#Add total mRNAs column to pData
+pData(dat)$Total_mRNAs <- sparse_Sums(exprs(dat), rowSums = F)
+dat<-detect_genes(dat, min_expr = 1)
+dat<-dat[fData(dat)$num_cells_expressed >=5]
+fData(dat)$mean_cpc<-rowMeans(exprs(dat))
+#make data frame for ggplots
+dat_means<-data.frame("gene_short_name" = fData(dat)$gene_short_name,"mean_cpc"=fData(dat)$mean_cpc, "num_cells_expresed"=fData(dat)$num_cells_expressed)
+pdf(file = "../Plots/mean_cpc.pdf", height = 3, width = 3)
+ggplot(dat_means) +
+  geom_density(aes(x=log10(mean_cpc))) + 
+  scale_color_manual(values=c("red", "black")) + theme_bw()
+dev.off()
+
+pdf(file = "../Plots/Total_RNAs.pdf", height = 3, width = 3)
+dat_rnas<-data.frame("cell_id" = pData(dat)$cell_id,"Total_mRNAs"=pData(dat)$Total_mRNAs)
+ggplot(dat_rnas) +
+  geom_density(aes(x=log10(Total_mRNAs), color=cell_id)) + geom_vline(xintercept = log10(1100)) + theme_bw()
+dev.off()
+
+dat<-dat[!is.na(fData(dat)$gene_short_name)]
+dat<-dat[!duplicated(fData(dat)$gene_short_name)]
+
+### try and annotate background debris
+sce<-create_SCE(counts(dat))
+rownames(sce@gene_data)<-fData(dat)$gene_short_name
+rownames(sce@counts)<-fData(dat)$gene_short_name
+mt_genes <- grep(pattern="^mt-", x=rownames(sce@gene_data), ignore.case=TRUE, value=TRUE)
+sce <- get_gene_pct(x = sce, genes=mt_genes, name="pct.mt")
+malat <- grep(pattern="^malat1$", x=rownames(sce@gene_data), ignore.case=TRUE, value=TRUE)
+sce <- get_gene_pct(x = sce, genes=malat, name="MALAT1")
+
+# Plot total counts ranked
+pdf("../Plots/droplet_cutoff.pdf")
+barcode_rank_plot(sce) + geom_hline(yintercept = 1500, linetype = "dashed", color = "red")
+dev.off()
+
+p1 <- plot_data(sce, feat_x = "total_counts", feat_y = "n_genes", 
+                log_x = TRUE, log_y = TRUE, ret = TRUE, data_type = "all")
+p2 <- plot_data(sce, feat_x = "n_genes", feat_y = "pct.mt", 
+                log_x = TRUE, log_y = FALSE, ret = TRUE, data_type = "all")
+p3 <- plot_data(sce, feat_x = "n_genes", feat_y = "MALAT1", 
+                log_x = TRUE, log_y = FALSE, ret = TRUE, data_type = "all")
+p4 <- plot_data(sce, feat_x = "pct.mt", feat_y = "MALAT1", 
+                log_x = FALSE, log_y = FALSE, ret = TRUE, data_type = "all")
+
+pdf("../Plots/diem_plots.pdf")
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+dev.off()
+
+# DIEM steps (choose 1500 UMIs as the cutoff for true nuclei)
+sce <- set_debris_test_set(sce, verbose = T, min_counts = 1500)
+sce <- filter_genes(sce)
+sce <- get_pcs(sce)
+sce <- init(sce, threads = 16)
+sce <- run_em(sce, threads = 16)
+sce <- assign_clusters(sce)
+sce <- estimate_dbr_score(sce)
+
+# Evaluate debris scores
+plot_clust(sce, feat_x = "n_genes", feat_y = "score.debris", 
+           log_x = TRUE, log_y = FALSE)
+plot_clust(sce, feat_x = "pct.mt", feat_y = "score.debris", 
+           log_x = TRUE, log_y = FALSE)
+
+# Call targets using debris score for single-nucleus data
+sce <- call_targets(sce, thresh_score = 0.15)
+
+#Subset dat by barcodes that aren't debris
+barcodes<-colnames(sce@norm)
+genes<-rownames(sce@norm)
+
+cds<-dat[,colnames(exprs(dat)) %in% barcodes]
+cds<-cds[fData(cds)$gene_short_name %in% genes]
+
+cds<-cds[,sce@test_data$Call == "Clean"]
+#Separate by cell_id and annotate doublets
+cell_cds<-lapply(unique(pData(cds)$cell_id), function(x){
+  return(cds[,pData(cds)$cell_id == x])
+})
+names(cell_cds)<-unique(pData(cds)$cell_id)
+
+cell_cds_dubs<-lapply(unique(pData(cds)$cell_id), function(x){
+  return(cxds_bcds_hybrid(cell_cds[[x]]))
+})
+
+cds<-combine_cds(cell_cds_dubs)
+cds<-cds[,pData(cds)$hybrid_score < 0.5]
+rm(list=setdiff(ls(), c("dat", "cds", "sce")))
+
+cds_rnas<-data.frame("cell_id" = pData(cds)$cell_id,"Total_mRNAs"=pData(cds)$Total_mRNAs)
+ggplot(cds_rnas) +
+  geom_density(aes(x=Total_mRNAs, color=cell_id)) + theme_bw()
+
+
+pdf(file = "../Plots/num_genes_exprs.pdf", height = 3, width = 3)
+cds_genes<-data.frame("cell_id" = pData(cds)$cell_id,"num_genes"=pData(cds)$num_genes_expressed)
+ggplot(cds_genes) +
+  geom_density(aes(x=num_genes, color=cell_id))  + theme_bw()
+dev.off()
+
+rm(list=setdiff(ls(), c("dat", "cds", "sce")))
+
+cds<-detect_genes(cds, min_expr = 1)
+cds<-cds[fData(cds)$num_cells_expressed >=5]
+fData(cds)$mean_cpc<-rowMeans(exprs(cds))
+
+#remove version numbers from gene names (needs to be done for tricycle to work...)
+exprs<-exprs(cds)
+feat<-fData(cds)
+pheno<-pData(cds)
+
+rownames(exprs)<-feat$ensembl_gene_id.x
+rownames(feat)<-feat$ensembl_gene_id.x
+
+cds<-new_cell_data_set(expression_data = exprs,
+                  cell_metadata = pheno,
+                  gene_metadata = feat)
+
+saveRDS(cds, "../Assets/cds.rds")
+cds<-readRDS("../Assets/cds.rds")
+```
+
+```{r}
+#choose the number of PCs to use for downstream analysis
+layer_genes<-c("Lhx5", "A930038C07Rik", "Reelin", "9830123M21Rik", "Rgs8", "Cart", "Tle1", "Tle3", "Mdgal", "Mirn189", "Kcnip2", "Rorb", "Cyp39al", "Lhx2", "Unc5d", "Gpr6", "Mef2c", "Dtx4", "Cux1", "Cux2", "Kitl", "Svet1", "Bhlhb5", "Plxnd1", "Scip", "Marcksl1", "Pou3f3", "Pou3f2", "Er81", "Trmt9b", "C030003D03Rik", "Nfh", "Cntn6", "Foxo1", "Ecpn", "Lix1","Syt9", "S100a10", "Oma1", "Ldb2", "Crim1", "Pcp4", "Rac3", "Diap3", "Bcl11b", "Crym", "Otx1", "Fezf2", "Igfbp4", "Tcrb", "Sox5", "Dkk3", "Tle4", "Sema3e", "Nr4a3", "Lxn","Foxp2", "Darpp32", "Igh6", "Id2", "Slitrk1", "Tbr1", "Lmo4", "Lmo3", "Ctgf", "Nurr1", "Satb2")
+
+cds <- preprocess_cds(cds, num_dim = 25)
+plot_pc_variance_explained(cds)
+cds <- reduce_dimension(cds, preprocess_method = "PCA", max_components = 2, cores = 16, reduction_method = "UMAP")
+cds <- cluster_cells(cds, cluster_method = "leiden", reduction_method = "UMAP", k = 50)
+pData(cds)$cluster<-cds@clusters$UMAP$clusters
+pData(cds)$genotype<-as.factor(pData(cds)$genotype)
+pData(cds)$genotype<-factor(pData(cds)$genotype, levels = c("WT", "P2KO"))
+
+#prune unwanted clusters
+plot_cells(cds, color_cells_by = "cluster", label_cell_groups = F) + coord_fixed() + scale_color_manual(values = cols25(n=25))
+plot_cells(cds[,pData(cds)$cluster %in% c(1:9,13)], color_cells_by = "cluster", show_trajectory_graph = FALSE, label_cell_groups = F) + coord_fixed()  + scale_color_manual(values = cols25(n=25))
+cds<-cds[,pData(cds)$cluster %in% c(1:9,13)]
+
+#Perform PCA, UMAP and cluster again
+cds <- preprocess_cds(cds, num_dim = 25)
+plot_pc_variance_explained(cds)
+cds <- reduce_dimension(cds, preprocess_method = "PCA", max_components = 2, cores = 16, reduction_method = "UMAP")
+cds <- cluster_cells(cds, cluster_method = "leiden", reduction_method = "UMAP", k = 50)
+pData(cds)$cluster<-cds@clusters$UMAP$clusters
+plot_cells(cds, color_cells_by = "cluster", label_cell_groups = F) + coord_fixed() + scale_color_manual(values = cols25(n=25))
+plot_cells(cds[,pData(cds)$cluster %in% c(1:6)], color_cells_by = "cluster", show_trajectory_graph = FALSE, label_cell_groups = F) + coord_fixed()  + scale_color_manual(values = cols25(n=25))
+cds<-cds[,pData(cds)$cluster %in% c(1:6)]
+cds <- cluster_cells(cds, cluster_method = "leiden", reduction_method = "UMAP", k = 50)
+pData(cds)$cluster<-cds@clusters$UMAP$clusters
+plot_cells(cds, color_cells_by = "cluster", label_cell_groups = F) + coord_fixed() + scale_color_manual(values = cols25(n=25))
+pData(cds)$group = dplyr::recode(pData(cds)$cluster,
+                                   "1"="1",
+                                   "2"="1",
+                                   "3"="2",
+                                   "4"="3",
+                                   "5"="4",
+                                   "6"="5",
+                                   "7"="6")
+
+plot_cells(cds, color_cells_by = "group", label_cell_groups = F) + coord_fixed() + scale_color_manual(values = cols25(n=25))                                   
+                                   
+
+#Plot UMAPs for the subsetted cds
+genes_interesting<-as.factor(c("Hes5", "Gli3", "Eomes", "Lhx2", "Cux1", "Satb2", "Pou3f2", "Tbr1", "Foxp2", "Tle4", "Bcl11b","Necab1"))
+pdf("../Plots/umap_neuro_genes.pdf")
+plot_cells(cds, genes = genes_interesting , show_trajectory_graph = FALSE, label_cell_groups = F, min_expr = 1.75) + coord_fixed()
+dev.off()
+
+pdf("../Plots/umap_layer_genes.pdf")
+plot_cells(cds, genes = layer_genes, show_trajectory_graph = F, label_cell_groups = F, min_expr = 1.75, alpha = 0.75) + coord_fixed()
+dev.off()
+
+pdf("../Plots/umap_clusters.pdf")
+plot_cells(cds, color_cells_by = "group", show_trajectory_graph = FALSE, label_cell_groups = F) + scale_color_manual(values = cols25(n=7)) + coord_fixed()
+dev.off()
+
+pdf("../Plots/umap_genotype.pdf")
+plot_cells(cds, color_cells_by = "genotype", show_trajectory_graph = FALSE, label_cell_groups = F, alpha = 0.75) + scale_color_manual(values = c("steelblue", "firebrick")) + coord_fixed()
+dev.off()
+
+plot_cells(cds, genes = c("Robo1"), show_trajectory_graph = FALSE, label_cell_groups = F) + coord_fixed()
+
+#cell cycle analysis on APCs
+assay(cds, "logcounts")<-log(exprs(cds) + 1)
+tmp<-estimate_cycle_position(x=cds, exprs_values = "logcounts")
+
+plot_emb_circle_scale(tmp, dimred="UMAP", point.size = 0.5) + coord_fixed()
+
+pdf("../Plots/tricycle.pdf", width = 5, height = 5)
+plot_ccposition_den(pData(tmp)$tricyclePosition,
+                    pData(tmp)$genotype, color_name = "genotype",
+                    bw=10) +
+                    ggpubr::theme_pubr() + coord_fixed(ratio = 10/1)
+dev.off()
+
+saveRDS(cds, "../Assets/cds.rds")
+cds<-readRDS("../Assets/cds.rds")
+```
+
+```{r}
+#find marker genes to aid with annotations
+marker_test <- top_markers(cds, group_cells_by="cluster", cores=32)
+
+top_specific_markers <- marker_test %>%
+                            filter(fraction_expressing >= 0.10) %>%
+                            group_by(cell_group) %>%
+                            top_n(5, pseudo_R2)
+
+top_specific_marker_ids <- unique(top_specific_markers %>% pull(gene_id))
+markers<-unique(top_specific_markers$gene_short_name)
+
+```
+
+```{r}
+plot_stacked_violins<-function(cds = NULL, genes = c("NULL"), group_by = "cluster", assay_name = "counts" ){
+cds<-cds[fData(cds)$gene_short_name %in% genes]
+features<-unique(fData(cds)$gene_short_name)
+list<-lapply(features, function(x){
+    tmp<-cds[fData(cds)$gene_short_name == x,]
+    data.frame("Cell" = colnames(tmp), "Idents" = as.factor(pData(tmp)[[group_by]]), "Feat" = rep(x), "Expr" = exprs(tmp)[1,])
+  })
+tmp<-do.call(rbind, list)
+tmp$Expr<-log2(tmp$Expr + 0.1)
+
+avg <- sapply(X = split(x = tmp, f = tmp$Idents),
+              FUN = function(df) { return(tapply(X = df$Expr, INDEX = df$Feat, FUN = mean)) })
+
+L2Norm <- function(mat, MARGIN){
+        normalized <- sweep(x = mat, MARGIN = MARGIN,
+                            STATS = apply(X = mat, MARGIN = MARGIN,
+                                          FUN = function(x){ sqrt(x = sum(x ^ 2)) }), FUN = "/")
+        normalized[!is.finite(x = normalized)] <- 0
+        return(normalized)
+}
+idents.order <- hclust(d = dist(t(L2Norm(mat = avg, MARGIN = 2))))$order
+avg <- avg[,idents.order]
+avg <- L2Norm(mat = avg, MARGIN = 1)
+mat <- hclust(d = dist(avg))$merge
+
+position <- apply(X = avg, MARGIN = 1, FUN = which.max)
+orderings <- list()
+for (i in 1:nrow(mat)) {
+        x <- if (mat[i,1] < 0) -mat[i,1] else orderings[[mat[i,1]]]
+        y <- if (mat[i,2] < 0) -mat[i,2] else orderings[[mat[i,2]]]
+        x.pos <- min(x = position[x])
+        y.pos <- min(x = position[y])
+        orderings[[i]] <- if (x.pos < y.pos) { c(x, y) } else { c(y, x) }
+}
+features.order <- orderings[[length(orderings)]]
+tmp$Idents <- factor(tmp$Idents, levels = levels(tmp$Idents)[idents.order])
+tmp$Feat <- as.factor(tmp$Feat)
+tmp$Feat <- factor(tmp$Feat, levels = levels(tmp$Feat)[features.order])
+
+  ggplot(tmp, aes(factor(Idents), Expr, fill = Idents)) +
+        geom_violin(scale = "width", adjust = 1, trim = TRUE) +
+        scale_y_continuous(expand = c(0, 0), position="right", labels = function(x)
+                           c(rep(x = "", times = length(x)-2), x[length(x) - 1], "")) +
+        facet_grid(rows = vars(Feat), scales = "free", switch = "y") +
+        theme_cowplot(font_size = 12) +
+        theme(legend.position = "none", panel.spacing = unit(0, "lines"),
+              panel.background = element_rect(fill = NA, color = "black"),
+              strip.background = element_blank(),
+              strip.text = element_text(face = "bold"),
+              strip.text.y.left = element_text(angle = 0),
+              axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+         xlab(group_by) + ylab("Expression Level")
+}
+
+pdf("../Plots/marker_violins.pdf", width = 4, height = 6 )
+plot_stacked_violins(cds = cds, genes = layer_genes, group_by = "cluster") +  scale_fill_manual(values = cols25(n=7))
+dev.off()
+
+monocle3::plot_genes_violin(cds_subset = cds[fData(cds)$gene_short_name %in% markers], group_cells_by = "cluster", pseudocount = 1)
+```
+
+
+```{r}
+#Differential gene expression analysis
+gene_fits <- fit_models(cds, model_formula_str = "~genotype*group + num_genes_expressed", cores = 16)
+fit_coefs <- coefficient_table(gene_fits)
+terms <- fit_coefs %>% filter(term != "(Intercept)")
+diff_genes<-terms %>% filter(q_value < 0.00000000005) %>%
+         dplyr::select(gene_short_name, term, q_value, estimate, std_err, p_value)
+diff_genes_cluster<-diff_genes[stringr::str_starts(string = diff_genes$term, pattern = "genotypeP2KO"),]
+diff_genes_cluster$term<-str_replace(diff_genes_cluster$term, "genotypeP2KO$", "genotypeP2KO:group1")
+write.csv(diff_genes_cluster, file = "../Tables/diff_genes_cluster.csv")
+rm(list = c("gene_fits", "fit_coefs", "terms", "diff_genes_cluster"))
+
+diff_genes_cluster<-read.csv("../Tables/diff_genes_cluster.csv")[,-1]
+
+diff_list<-lapply(unique(diff_genes_cluster$term), function(x){
+  return(diff_genes_cluster[diff_genes_cluster$term == x,])
+})
+
+names(diff_list)<-unique(diff_genes_cluster$term)
+
+test<-lapply(names(diff_list), function(x){
+  diff_list[[x]] %>% kbl(row.names = F) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>% 
+  kable_styling(latex_options = c("hold_position", "repeat_header"))
+})
+
+save_kable(test, "../Tables/diff_genes_cluster.pdf")
+
+
+dat.diff<-cds[fData(cds)$gene_short_name %in% diff_genes_cluster$gene_short_name]
+
+norm_exprs <- t(scale(t(assay(dat.diff, "logcounts"))))
+
+anno <- HeatmapAnnotation(cluster = pData(dat.diff)$cluster, genotype = pData(dat.diff)$genotype, col = list(genotype = c("WT" = "steelblue", "P2KO" = "firebrick"), cluster = c("1"="#1F78C8", "2"="#ff0000", "3"="#33a02c", "4"="#6A33C2", "5"="#ff7f00", "6"="#565656", "7"="#FFD700")))
+
+col_fun = colorRamp2(c(-1, 0, 1), c("red", "white", "blue"))
+col_fun(seq(-3, 3))
+
+pdf("../Plots/heatmap_clusters.pdf")
+Heatmap(norm_exprs, top_annotation = anno, 
+        show_column_names = F, 
+        show_row_names = F, 
+        cluster_columns = T, 
+        cluster_rows = T, 
+        use_raster = F, 
+        cluster_column_slices = T,
+        cluster_row_slices = T, 
+        column_split = list(pData(dat.diff)[tmp,]$cluster, pData(dat.diff)[tmp,]$genotype), 
+        show_column_dend = F, 
+        show_row_dend = F, 
+        column_title = NULL, 
+        col = col_fun)
+dev.off()
+```
+
+
+```{r}
+#Differential gene expression analysis
+gene_fits <- fit_models(cds, model_formula_str = "~genotype + num_genes_expressed", cores = 16)
+fit_coefs <- coefficient_table(gene_fits)
+terms <- fit_coefs %>% filter(term != "(Intercept)")
+diff_genes<-terms %>% filter(q_value < 0.00000000005) %>%
+         dplyr::select(gene_short_name, term, q_value, estimate, std_err, p_value)
+diff_genes<-diff_genes[stringr::str_starts(string = diff_genes$term, pattern = "genotypeP2KO"),]
+write.csv(diff_genes, file = "../Tables/diff_genes.csv")
+rm(c("gene_fits", "fit_coefs", "terms"))
+diff_genes<-read.csv("../Tables/diff_genes.csv")[,-1]
+
+pdf("../Tables/diff_genes.pdf")
+diff_genes %>% kbl(row.names = F) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>% 
+  kable_styling(latex_options = c("hold_position", "repeat_header"))
+dev.off()
+
+dat.diff<-cds[fData(cds)$gene_short_name %in% diff_genes$gene_short_name]
+
+tmp<-pData(dat.diff)[sample(nrow(pData(dat.diff)), 1000),]$barcode
+
+norm_exprs <- t(scale(t(assay(dat.diff, "logcounts"))))
+norm_exprs<-norm_exprs
+anno <- HeatmapAnnotation(#cluster = pData(dat.diff)[tmp,]$cluster, 
+                          genotype = pData(dat.diff)$genotype, 
+                          col = list(genotype = c("WT" = "steelblue", "P2KO" = "firebrick"))) 
+                          #cluster = c("1"="#1F78C8", "2"="#ff0000", "3"="#33a02c", "4"="#6A33C2", "5"="#ff7f00", "6"="#565656", "7"="#FFD700")))
+
+col_fun = colorRamp2(c(-1, 0, 1), c("red", "white", "blue"))
+col_fun(seq(-3, 3))
+
+pdf("../Plots/heatmap.pdf", width=6, height=3)
+Heatmap(norm_exprs, top_annotation = anno, 
+        show_column_names = F, 
+        show_row_names = F, 
+        cluster_columns = T, 
+        cluster_rows = T, 
+        use_raster = F, 
+        cluster_column_slices = F,
+        cluster_row_slices = T, 
+        column_split = pData(dat.diff)$genotype, 
+        show_column_dend = F, 
+        show_row_dend = F, 
+        column_title = NULL, 
+        col = col_fun, na_col = "black"
+        )
+dev.off()
+```
+
+```{r}
+#GO analysis
+universe<-bitr(fData(cds)$gene_short_name, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = "org.Mm.eg.db")
+
+list.clusters<-lapply(unique(diff_genes_cluster$term), function(x){
+  return(diff_genes_cluster[diff_genes_cluster$term == x,])
+})
+names(list.clusters)<-unique(diff_genes_cluster$term)
+
+list.clusters<-lapply(names(list.clusters), function(x){
+  tmp<-bitr(list.clusters[[x]]$gene_short_name, fromType = "SYMBOL", toType = "ENTREZID", OrgDb="org.Mm.eg.db")
+  return(tmp$ENTREZID)
+})
+names(list.clusters)<-unique(diff_genes_cluster$term)
+
+enrichList.clusters<-lapply(names(list.clusters), function(x){
+  return(enrichGO(list.clusters[[x]],OrgDb="org.Mm.eg.db", ont = "BP", universe = universe$ENTREZID))
+})
+
+names(enrichList.clusters)<-c("Group 1", "Group 2", "Group 3", "Group 4", "Group 5", "Group 6")
+
+tmp<-lapply(c(1:6), function(x){
+  tmp<-enrichList.clusters[[x]][,]
+  tmp$group<-rep(x)
+  return(tmp)
+})
+
+tmp<-do.call(rbind, tmp)
+write.csv(tmp, "../Tables/GOenrich_clusters.csv")
+
+mem_clusters<- multiEnrichMap(enrichList.clusters,
+   enrichBaseline=1,
+   cutoffRowMinP=0.05,
+   colorV=c("blue", "red"),
+   topEnrichN=10)
+
+mem_enrichment_heatmap(mem_clusters, style = "heatmap", row_fontsize = 14, column_fontsize = 14, row_dend_width = grid::unit(5, "mm"), cluster_columns = T, row_names_max_width = grid::unit(500,"mm"))
+
+#### KEGG
+universe<-bitr(fData(cds)$gene_short_name, fromType = "SYMBOL", toType = "UNIPROT", OrgDb = "org.Mm.eg.db")
+
+list.clusters<-lapply(unique(diff_genes_cluster$term), function(x){
+  return(diff_genes_cluster[diff_genes_cluster$term == x,])
+})
+names(list.clusters)<-unique(diff_genes_cluster$term)
+
+list.clusters<-lapply(names(list.clusters), function(x){
+  tmp<-bitr(list.clusters[[x]]$gene_short_name, fromType = "SYMBOL", toType = "UNIPROT", OrgDb="org.Mm.eg.db")
+  return(tmp$UNIPROT)
+})
+names(list.clusters)<-unique(diff_genes_cluster$term)
+
+enrichList.clusters<-lapply(names(list.clusters), function(x){
+  return(enrichKEGG(list.clusters[[x]], keyType = 'uniprot',organism = "mmu", universe = universe$UNIPROT))
+})
+names(enrichList.clusters)<-c("Group 1", "Group 2", "Group 3", "Group 4", "Group 5", "Group 6")
+
+mem_clusters<- multiEnrichMap(enrichList.clusters,
+   enrichBaseline=1,
+   cutoffRowMinP=0.05,
+   colorV=c("blue", "red"),
+   topEnrichN=10)
+
+pdf("../Plots/GO_heatmap.pdf", height = 9, width = 9)
+mem_enrichment_heatmap(mem_clusters, style = "heatmap", row_fontsize = 14, column_fontsize = 14, row_dend_width = grid::unit(5, "mm"), cluster_columns = T, row_names_max_width = grid::unit(500,"mm"))
+dev.off()
+```
+
+```{r}
+#milo analsis
+dat.milo<-Milo(cds)
+dat.milo<-buildGraph(dat.milo, k = 50 , d=25, reduced.dim = "PCA", trans)
+dat.milo<-makeNhoods(dat.milo, prop = 0.05, k = 50, d=25, refined = TRUE, reduced_dims = "PCA")
+plotNhoodSizeHist(dat.milo)
+dat.milo <- countCells(dat.milo, meta.data = as.data.frame(colData(dat.milo)), samples="cell_id")
+head(nhoodCounts(dat.milo))
+dat.design<-data.frame(colData(dat.milo))[,c("genotype", "cell_id")]
+dat.design <- distinct(dat.design)
+rownames(dat.design) <- dat.design$cell_id
+dat.milo <- calcNhoodDistance(dat.milo, d=25, reduced.dim = "PCA")
+da_results <- testNhoods(dat.milo, design = ~ genotype, design.df = dat.design, reduced.dim="PCA")
+#head(da_results)
+da_results %>%
+  arrange(SpatialFDR) %>%
+  head() 
+ggplot(da_results, aes(PValue)) + geom_histogram(bins=50)
+ggplot(da_results, aes(logFC, -log10(SpatialFDR))) + 
+  geom_point() +
+  geom_hline(yintercept = 2)
+dat.milo <- buildNhoodGraph(dat.milo)
+## Plot single-cell UMAP
+# umap_pl <- scater::plotReducedDim(dat.milo, dimred = "UMAP", colour_by="genotype", text_by = "cluster", 
+#                           text_size = 3, point_size=0.5) +
+#   guides(fill="none")
+umap_pl <- monocle3::plot_cells(cds,color_cells_by = "genotype", cell_size=0.25, label_cell_groups = F, alpha = 0.75) +  scale_color_manual(values=c("steelblue", "firebrick")) + coord_fixed()
+# Plot neighbourhood graph
+nh_graph_pl <- plotNhoodGraphDA(dat.milo, da_results, layout="UMAP",alpha=0.5)  + coord_fixed()
+pdf("../Plots/nh_graph_milo.pdf")
+nh_graph_pl
+dev.off()
+
+pdf("../Plots/beeswarm.pdf", height = 7, width = 7)
+plotDAbeeswarm(groupNhoods(dat.milo, da_results, max.lfc.delta = 4, overlap = 2, da.fdr = 0.05), group.by = "NhoodGroup")
+dev.off()
+
+da_results <- groupNhoods(dat.milo, da_results, max.lfc.delta = 4, overlap = 2, da.fdr = 0.05)
+umap_nhoods<-plotNhoodGroups(dat.milo, da_results, layout="UMAP") 
+
+pdf("../Plots/milo_da_analysis.pdf", height = 10, width = 10)
+   umap_pl + nh_graph_pl + umap_nhoods +
+     plot_layout(guides="collect") + coord_fixed()
+dev.off()
+
+keep.rows <- rowSums(logcounts(dat.milo)) != 0
+dat.milo <- dat.milo[keep.rows, ]
+dec <- modelGeneVar(dat.milo)
+hvgs <- getTopHVGs(dec, n=2000)
+
+#DA Marker genes
+dat.milo <- logNormCounts(dat.milo)
+
+da_results$NhoodGroup <- as.numeric(da_results$SpatialFDR < 0.1 & da_results$logFC < 0)
+da_nhood_markers <- findNhoodGroupMarkers(dat.milo, da_results, subset.row = rownames(dat.milo))
+da_nhood_markers<-da_nhood_markers[da_nhood_markers$adj.P.Val_0 < 0.05,]
+
+#get gene short names
+tmp<-biomaRt::getBM(attributes = c("ensembl_gene_id","external_gene_name"), mart = mart, filters= "ensembl_gene_id", values = da_nhood_markers$GeneID, verbose = T)
+da_nhood_markers$gene_short_name<-tmp$external_gene_name
+
+ggplot(da_nhood_markers, aes(x=logFC_0, y=-log10(adj.P.Val_0), label=gene_short_name)) + geom_point(aes(color= logFC_0 > 0.1 | logFC_0 < -0.1)) + ggprism::theme_prism() + ggrepel::geom_label_repel() + scale_color_manual(values=(c("black", "red"))) + theme(legend.position = "none") + ylab("-log10(p-value)") + xlab("LogFC 0")
+
+
+pdf("../Plots/milo_cluster2_genes.pdf")
+plot_cells(cds, genes=c("Nfib", "Nfia", "Cdh13", "Sox5", "Lsamp", "Rbfox1", "Robo1", "Robo2"), min_expr = 10, show_trajectory_graph = FALSE, label_cell_groups = F) + coord_equal() + facet_wrap(~feature_label, nrow = 2)
+dev.off()
+
+#GO analysis baby
+Nhood_1_genes<-da_nhood_markers[da_nhood_markers$logFC_0>0,]
+Nhood_2_genes<-da_nhood_markers[da_nhood_markers$logFC_0<0,]
+
+#nhood 1
+universe<-bitr(da_nhood_markers$gene_short_name, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = "org.Mm.eg.db")
+tmp<-bitr(Nhood_1_genes$gene_short_name, fromType = "SYMBOL", toType = "ENTREZID", OrgDb="org.Mm.eg.db")
+tmp2<-enrichGO(tmp$ENTREZID,OrgDb="org.Mm.eg.db", ont = "BP", keyType = "ENTREZID", universe = universe$ENTREZID)
+pdf("../Plots/nhood1_BPGO.pdf", height = 5, width = 10)
+dotplot(tmp2, showCategory = 10)
+dev.off()
+
+#nhood 2
+tmp<-bitr(Nhood_2_genes$gene_short_name, fromType = "SYMBOL", toType = "ENTREZID", OrgDb="org.Mm.eg.db")
+tmp2<-enrichGO(tmp$ENTREZID,OrgDb="org.Mm.eg.db", ont = "BP", universe = universe$ENTREZID)
+pdf("../Plots/nhood2_BPGO.pdf", height = 5, width = 10)
+dotplot(tmp2, showCategory = 10)
+dev.off()
+
+```
+
+```{r}
+#qki-6 binding
+qki_6<-read.csv("../Assets/41467_2021_21703_MOESM3_ESM.csv")
+diff.venn<-list(Global=unique(diff_genes$gene_short_name), Cluster=unique(diff_genes_cluster$gene_short_name), Qki_6 = unique(qki_6$gene))
+pdf("../Plots/venn_qki_6.pdf", width = 5,height = 5)
+ggvenn::ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+phyper(q = 33, m = length(unique(qki_6$gene)), n = length(fData(cds)$gene_short_name)-length(unique(qki_6$gene)), k=length(unique(c(unique(diff_genes$gene_short_name),unique(diff_genes_cluster$gene_short_name)))),lower.tail = F)
+
+#qki-5 binding
+qki_5<-read.delim("../Assets/ENCORI_mm10_CLIP-seq_RBP-RNA_qk_all medium.txt", skip = 3)
+diff.venn<-list(Global=unique(diff_genes$gene_short_name), Cluster=unique(diff_genes_cluster$gene_short_name), Qki_5 = unique(qki_5$geneName))
+pdf("../Plots/venn_qki_5.pdf", width = 5,height = 5)
+ggvenn::ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+phyper(q = 525, m = length(qki_5$geneName), n = length(fData(cds)$gene_short_name)-length(unique(qki_5$geneName)), k=length(unique(c(unique(diff_genes$gene_short_name),unique(diff_genes_cluster$gene_short_name)))),lower.tail = F)
+
+#elavl1 binding
+hur<-read.csv("../Assets/POSTAR3_CLIPdb_module_RBP_binding_sites_HuR.csv")
+hur<-hur[hur$ProtocolHITS.CLIP.CIMSHITS.CLIP.Piranha_0.01 == "HITS-CLIP,CIMS",]
+diff.venn<-list(Global=diff_genes$gene_short_name, Cluster=unique(diff_genes_cluster$gene_short_name), HuR = unique(hur$Target.gene.symbol))
+pdf("../Plots/venn_hur.pdf", width = 5,height = 5)
+ggvenn::ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+phyper(q =126, m = length(unique(hur$Target.gene.symbol)), n = length(fData(cds)$gene_short_name)-length(unique(hur$Target.gene.symbol)), k=length(unique(c(unique(diff_genes$gene_short_name),unique(diff_genes_cluster$gene_short_name)))),lower.tail = F)
+
+#srsf3 binding
+srsf3<-read.csv("../Assets/POSTAR3_CLIPdb_module_RBP_binding_sites_SRSF3.csv")
+srsf3<-srsf3[srsf3$ProtocolFr.iCLIP.Piranha_0.01Fr.iCLIP.PureCLIPiCLIP.CIMSiCLIP.Piranha_0.01 == "iCLIP,CIMS",]
+diff.venn<-list(Global=diff_genes$gene_short_name, Cluster=unique(diff_genes_cluster$gene_short_name), SRSF3 = unique(srsf3$Target.gene.symbol))
+pdf("../Plots/venn_srsf3.pdf", width = 5,height = 5)
+ggvenn::ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+phyper(q = 379, m = length(unique(srsf3$Target.gene.symbol)), n = length(fData(cds)$gene_short_name)-length(unique(srsf3$Target.gene.symbol)), k=length(unique(c(unique(diff_genes$gene_short_name),unique(diff_genes_cluster$gene_short_name)))),lower.tail = F
+)
+#ezh2 binding
+ezh2<-read.csv("../Assets/POSTAR3_CLIPdb_module_RBP_binding_sites_EZH2.csv")
+diff.venn<-list(Global=diff_genes$gene_short_name, Cluster=unique(diff_genes_cluster$gene_short_name), EZH2 = unique(ezh2$Target.gene.symbol))
+pdf("../Plots/venn_ezh2.pdf", width = 5,height = 5)
+ggvenn::ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+phyper(q = 102, m = length(unique(ezh2$Target.gene.symbol)), n = length(fData(cds)$gene_short_name)-length(unique(ezh2$Target.gene.symbol)), k=length(unique(c(unique(diff_genes$gene_short_name),unique(diff_genes_cluster$gene_short_name)))),lower.tail = F)
+
+#ATACseq integration
+atac<-read.delim("../Assets/diffPeaks_annotated.csv")
+diff.venn<-list(Global=diff_genes$gene_short_name, Cluster=unique(diff_genes_cluster$gene_short_name), ATAC = unique(atac$Gene.Name))
+pdf("../Plots/venn_atac.pdf", width = 5,height = 5)
+ggvenn::ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+phyper(q = 5, m = length(unique(atac$Gene.Name)), n = length(fData(cds)$gene_short_name)-length(unique(atac$Gene.Name)), k=length(unique(c(unique(diff_genes$gene_short_name),unique(diff_genes_cluster$gene_short_name)))),lower.tail = F)
+
+#ATACseq integration with qki and elavl1
+atac<-read.delim("../Assets/diffPeaks_annotated.csv")
+diff.venn<-list(qki= unique(qki$gene), hur=unique(hur$Target.gene.symbol), ATAC = unique(atac$Gene.Name))
+pdf("../Plots/venn_atac.pdf", width = 5,height = 5)
+ggvenn(diff.venn,
+       fill_color = c("#0073C2FF", "#EFC000FF", "#CD534CFF"),
+       stroke_size = 0.5, set_name_size = 4
+) 
+dev.off()
+
+a<-intersect(hur$Target.gene.symbol,atac$Gene.Name)
+b<-intersect(unique(diff_genes_cluster$gene_short_name), atac$Gene.Name)
+c<-intersect(unique(diff_genes$gene_short_name), atac$Gene.Name)
+
+atac_genes<-unique(c(a,b,c))
+plot_stacked_violins(cds, genes = c(atac_genes, "Nfix"), group_by = "cluster")
+
+#upset plot attempt
+input.list<-list(DEGs = c(unique(diff_genes$gene_short_name), unique(diff_genes_cluster$gene_short_name)), Qki = unique(qki$gene), HuR = unique(hur$Target.gene.symbol), Srsf3 = unique( srsf3$Target.gene.symbol), Ezh2 = unique(ezh2$Target.gene.symbol))
+
+sets<-list(c("Qki", "DEGs"), c("HuR", "DEGs"), c("Srsf3", "DEGs"), c("Ezh2", "DEGs"))
+pdf("../Plots/upset_RBP.pdf", height = 10, width = 10)
+upset(fromList(input.list), order.by = "freq", intersections = sets, text.scale = c(3, 3, 3, 2, 3, 3), point.size = 5)
+dev.off()
+```
+
+```{r}
+#grab genes related to notch
+notch<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0007219", verbose = T)
+notch_genes<-notch[notch$go_id == "GO:0007219",]$external_gene_name 
+
+robo<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0035385", verbose = T)
+robo_genes<-robo[robo$go_id == "GO:0035385",]$external_gene_name
+
+wnt<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0016055", verbose = T)
+wnt_genes<-wnt[wnt$go_id == "GO:0016055",]$external_gene_name
+
+hedge<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0007224", verbose = T)
+hedge_genes<-hedge[hedge$go_id == "GO:0007224",]$external_gene_name
+
+dnarep<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0006260", verbose = T)
+dnarep_genes<-dnarep[dnarep$go_id == "GO:0006260",]$external_gene_name
+
+cellcycle<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0051726", verbose = T)
+cellcycle_genes<-cellcycle[cellcycle$go_id == "GO:0051726",]$external_gene_name
+
+migration<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0001764", verbose = T)
+migration_genes<-migration[migration$go_id == "GO:0001764",]$external_gene_name
+
+neurogen<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0030182", verbose = T)
+neurogen_genes<-neurogen[neurogen$go_id == "GO:0030182",]$external_gene_name
+
+celldiff<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0030900", verbose = T)
+celldiff_genes<-celldiff[celldiff$go_id == "GO:0030900",]$external_gene_name
+
+tgf<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0007179", verbose = T)
+tgf_genes<-tgf[tgf$go_id == "GO:0007179",]$external_gene_name
+
+g2m<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0000086", verbose = T)
+g2m_genes<-g2m[g2m$go_id == "GO:0000086",]$external_gene_name
+
+cortex<-biomaRt::getBM(attributes = c("go_id","name_1006","ensembl_gene_id","external_gene_name"), mart = mart, filters= "go", values = "GO:0021987", verbose = T)
+cortex_genes<-cortex[cortex$go_id == "GO:0021987",]$external_gene_name
+
+
+#find those genes that are in my DEGs list
+notch_int<-intersect(notch_genes, c(diff_genes_cluster$gene_short_name, diff_genes$gene_short_name))
+robo_int<-intersect(robo_genes, c(diff_genes_cluster$gene_short_name, diff_genes$gene_short_name))
+wnt_int<-intersect(wnt_genes, c(diff_genes_cluster$gene_short_name, diff_genes$gene_short_name))
+hedge_int<-intersect(hedge_genes, c(diff_genes_cluster$gene_short_name, diff_genes$gene_short_name))
+
+#make violin plots
+cds_subset<-cds[fData(cds)$gene_short_name %in% notch_int]
+plot_genes_violin(cds_subset, group_cells_by="genotype", ncol=4) + scale_fill_manual(values = c("firebrick", "steelblue")) + ggpubr::theme_pubr()
+
+cds_subset<-cds[fData(cds)$gene_short_name %in% robo_int]
+plot_genes_violin(cds_subset, group_cells_by="genotype", ncol=4) + scale_fill_manual(values = c("firebrick", "steelblue")) + ggpubr::theme_pubr()
+
+cds_subset<-cds[fData(cds)$gene_short_name %in% wnt_int]
+plot_stacked_violins(cds, genes = wnt_int, assay_name = "logcounts", group_by = "group") + scale_fill_manual(values = cols25(n=7))
+```
+
+```{r new function for estimates}
+estimates_plot<-function(co_table=NULL, genes=NULL){
+  x<-reshape2::melt(genes)
+  y<-co_table[co_table$gene_short_name %in% x$value,]
+  z<-merge(x, y, by.x = "value", by.y = "gene_short_name")
+  ggplot(z) + 
+    geom_point(aes(y=estimate, x=reorder(value, estimate), color = L1)) + 
+    geom_errorbar(aes(x=reorder(value, estimate), ymin= estimate-std_err, ymax=estimate+std_err), width=.2, position=position_dodge(.9)) +
+    geom_hline(yintercept = 0, colour = "black", linetype = "longdash") + 
+    ggprism::theme_prism() + xlab("Gene Name") + ylab("Estimate") + 
+    theme(axis.text.x=element_text(angle=90, hjust=1), legend.position = "none ", panel.spacing = unit(1, "lines")) + 
+    facet_grid(~L1, scales = "free_x", space = "free_x") + 
+    scale_color_manual(values=brewer.pal(9, "Set1"))
+}
+
+test<-list("Wnt" = wnt_genes, "Notch" = notch_genes, "Hedgehog" = hedge_genes, "Robo" = c(robo_genes, "Robo2"))
+estimates_plot(co_table = diff_genes, genes = test) + ylab("Estimated effect (ln link) of KO/WT")
+
+pdf("../Plots/Estimates_cellcycle.pdf", height = 5, width = 7)
+estimates_plot(co_table = diff_genes, genes = list("DNA replication" = dnarep_genes, "Cell cycle" = cellcycle_genes)) + ylab("Estimated effect (ln link) of KO/WT")
+dev.off()
+
+pdf("../Plots/Estimates_neuron_migration.pdf", height = 5, width = 10)
+estimates_plot(co_table = diff_genes, genes = list("Neuron Migration" = migration_genes, "Neuron Differentiation" = neurogen_genes)) + ylab("Estimated effect (ln link) of KO/WT")
+dev.off()
+
+pdf("../Plots/volcano_bulk.pdf", height = 5, width = 7)
+ggplot(diff_genes, aes(x=estimate, y=-log10(p_value), label=gene_short_name)) + geom_point(aes(color=100>-log10(p_value))) + ggprism::theme_prism() + ggrepel::geom_text_repel() + scale_color_manual(values=(c("red", "black"))) + theme(legend.position = "none") + ylab("-log10(p-value)") + xlab("estimated effect size (KO/WT)") + xlim(-5,5)
+dev.off()
+
+pdf("../Plots/volcano_cluster.pdf", height = 7, width = 14)
+ggplot(diff_genes_cluster, aes(x=estimate, y=-log10(q_value), label=gene_short_name)) + geom_point(aes(color=100>-log10(q_value))) + ggprism::theme_prism() + ggrepel::geom_text_repel() + scale_color_manual(values=(c("red", "black"))) + theme(legend.position = "none") + ylab("-log10(p-value)") + xlab("estimated effect size (KO/WT)") + xlim(-5,5) + facet_wrap(~term)
+dev.off()
+```
+
+```{r}
+cluster_bar<-data.frame("group"= unique(diff_genes_cluster$term))
+cluster_bar$num_genes<-sapply(cluster_bar$group, function(x){
+  tmp<-diff_genes_cluster[diff_genes_cluster$term == x,]
+  return(length(tmp$term))
+}, USE.NAMES = F)
+
+cluster_bar<-melt(cluster_bar)
+cluster_bar$group<-str_split(cluster_bar$group, pattern = ":", simplify = T)[,2]
+a<-ggplot(cluster_bar,aes(x=variable, y=value/length(unique(diff_genes_cluster$gene_short_name)), fill = group)) + geom_bar(position = "stack", stat = "identity",  color = "black") + scale_fill_manual(values = cols25(n=25)) + ggprism::theme_prism() + xlab("") + ylab("Proportion of global DEGs") + theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+
+
+b<-ggplot(cluster_bar,aes(x=variable, y=value/length(diff_genes$term), fill = group)) + geom_bar(position = "stack", stat = "identity",  color = "black") + scale_fill_manual(values = cols25(n=25)) + ggprism::theme_prism() + xlab("") + ylab("Proportion of cluster specific DEGs") + theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
+pdf("../Plots/proportion_plot.pdf", height = 5, width = 7)
+a + b + plot_layout(guides="collect")
+dev.off()
+```
+
+```{r}
+heat<-data.frame("gene_short_name" = unique(c(diff_genes_cluster$gene_short_name,diff_genes$gene_short_name)))
+heat$group1<-left_join(heat, diff_genes_cluster[diff_genes_cluster$term == "genotypeP2KO:group1",][,c(1,4)])$estimate
+heat$group2<-left_join(heat, diff_genes_cluster[diff_genes_cluster$term == "genotypeP2KO:group2",][,c(1,4)])$estimate
+heat$group3<-left_join(heat, diff_genes_cluster[diff_genes_cluster$term == "genotypeP2KO:group3",][,c(1,4)])$estimate
+heat$group4<-left_join(heat, diff_genes_cluster[diff_genes_cluster$term == "genotypeP2KO:group4",][,c(1,4)])$estimate
+heat$group5<-left_join(heat, diff_genes_cluster[diff_genes_cluster$term == "genotypeP2KO:group5",][,c(1,4)])$estimate
+heat$group6<-left_join(heat, diff_genes_cluster[diff_genes_cluster$term == "genotypeP2KO:group6",][,c(1,4)])$estimate
+heat$bulk<-left_join(heat, diff_genes[,c(1,4)])$estimate
+
+rownames(heat)<-heat$gene_short_name
+heat<-as.matrix(heat[,-1])
+heat[is.na(heat)]<-0
+
+col_fun = colorRamp2(c(-1, 0, 1), c("blue", "grey95", "red"))
+
+Heatmap(t(heat[rownames(heat) %in% layer_genes,]),border = T, rect_gp = gpar(col = "white", lwd = 2), column_title = "Layer specific", col = col_fun, name = "estimate effect size KO/WT") +
+  Heatmap(t(heat[rownames(heat) %in% cortex_genes,]),border = T, rect_gp = gpar(col = "white", lwd = 2), name = "estimate effect size KO/WT", column_title ="Cortex Development", col = col_fun) + 
+  Heatmap(t(heat[rownames(heat) %in% robo_genes,]),border = T, rect_gp = gpar(col = "white", lwd = 2), name = "estimate effect size KO/WT", col = col_fun) + 
+  Heatmap(t(heat[rownames(heat) %in% neurogen_genes,]),border = T, rect_gp = gpar(col = "white", lwd = 2), name = "estimate effect size KO/WT", column_title = "Neuronal Differentiation", col = col_fun) +
+  Heatmap(t(heat[rownames(heat) %in% wnt_genes,]),border = T, rect_gp = gpar(col = "white", lwd = 2), name = "estimate effect size KO/WT", column_title = "Wnt signaling", col = col_fun) + 
+    Heatmap(t(heat[rownames(heat) %in% cellcycle_genes,]),border = T, rect_gp = gpar(col = "white", lwd = 2), name = "estimate effect size KO/WT", column_title = "Regulation of cell cycle", col = col_fun) + 
+  plot_layout(guides="collect")
+
+```
+
+```{r}
+#musings
+ggplot(as.data.frame(pData(cds)), aes(tricyclePosition, color = group, fill = group)) + geom_density(alpha = 0.05) + facet_wrap(~genotype) + ggpubr::theme_pubr() +  scale_color_brewer(palette = "Set1") + scale_fill_brewer(palette = "Set1")
+
+ggplot(as.data.frame(pData(cds)), aes(tricyclePosition, color = genotype, fill = genotype)) + 
+  geom_density(alpha = 0.025) + facet_wrap(~group) + ggpubr::theme_pubr() +
+  scale_x_continuous(breaks  = c(seq(0, 2*pi, pi/2)), labels = c("0", "\u03c0/2", "\u03c0", "3/2\u03c0", "2\u03c0")) +
+  scale_color_manual(values=c("firebrick", "steelblue")) + 
+  scale_fill_manual(values=c("firebrick", "steelblue"))
+
+ks<-sapply(c(1:6), function(x){
+  i<-cds[,pData(cds)$group == x]
+  ks.test(pData(i[,pData(i)$genotype == "WT"])$tricyclePosition, pData(i[,pData(i)$genotype == "P2KO"])$tricyclePosition)
+})
+
+mw<-sapply(c(1:6), function(x){
+  i<-cds[,pData(cds)$group == x]
+  wilcox.test(tricyclePosition ~ genotype, pData(i))
+})
+
+
+low = 0.5*pi
+high = 1.5*pi
+ggplot(as.data.frame(pData(cds)), aes(x=genotype, fill = high > tricyclePosition & tricyclePosition > low)) + 
+  geom_bar(position = "fill", color="black") + 
+  #geom_text() + 
+  facet_wrap(~group) + 
+  scale_fill_manual(values = c("grey90", "red3")) + 
+  scale_y_continuous(labels=scales::percent) +
+  ggpubr::theme_pubr()
+
+
+tmp<-data.frame("group"= as.factor(c(1:6)), "diff"=rep(TRUE, 3))
+
+tmp$diff<-sapply(c(1:6), function(x){
+  y<-pData(cds)[pData(cds)$group == x,]
+  wt<-sum(high > y[y$genotype == "WT",]$tricyclePosition & y[y$genotype == "WT",]$tricyclePosition > low)/length(y[y$genotype == "WT",]$tricyclePosition)
+  ko<-sum(high > y[y$genotype == "P2KO",]$tricyclePosition & y[y$genotype == "P2KO",]$tricyclePosition > low)/length(y[y$genotype == "P2KO",]$tricyclePosition)
+  return(ko-wt)
+})
+
+ggplot(tmp, aes(y=group, x=diff, color = group)) + 
+  geom_point() + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_x_continuous(limits=c(-0.05, 0.05)) +
+  xlab("Difference in proportion of cycling cells (P2KO-WT)") +
+  ylab("Group #") +
+  scale_color_brewer(palette="Set1") +
+  coord_fixed(ratio = 1/50) +
+  ggpubr::theme_pubr()
+
+
+colData(dat.milo)["Nhoods"]<-NA
+colData(dat.milo)["NhoodGroup"]<-NA
+
+
+tmp<-lapply(c(1:length(colnames(dat.milo@nhoods))), function(x){
+  tmp<-data.frame("cell_id" = colnames(dat.milo)[dat.milo@nhoods[,x]==1], "nHood" = x, "nHoodGroup" = da_results[x,]$NhoodGroup)
+  return(tmp)
+})
+
+tmp<-lapply(c(1:10), function(x){
+  tmp<-data.frame("cell_id" = colnames(dat.milo)[dat.milo@nhoods[,x]==1], "nHood" = x, "nHoodGroup" = da_results[x,]$NhoodGroup)
+  return(tmp)
+})
+
+tmp<-do.call(rbind, tmp)
+
+```
+
+```{r}
+#generate files for GEO submission
+
+sapply(unique(pData(cds)$cell_id), function(x){
+  d<-cds[,pData(cds)$cell_id == x]
+  writeMM(exprs(d), paste0("../Assets/", x, ".mtx"))
+  write.csv(pData(d), paste0("../Assets/", x, "_cells.csv"))
+  write.csv(fData(d), paste0("../Assets/", x, "_genes.csv"))
+})
+
+```

@@ -1,0 +1,12 @@
+INFO [2022-02-07 18:54:44] $x
+INFO [2022-02-07 18:54:44] list(diff_genes$gene_short_name, unique(diff_genes_cluster$gene_short_name))
+INFO [2022-02-07 18:54:44] 
+INFO [2022-02-07 18:54:44] $filename
+INFO [2022-02-07 18:54:44] NULL
+INFO [2022-02-07 18:54:44] 
+INFO [2022-02-07 18:54:44] $output
+INFO [2022-02-07 18:54:44] T
+INFO [2022-02-07 18:54:44] 
+INFO [2022-02-07 18:54:44] $category.names
+INFO [2022-02-07 18:54:44] c("ALL_GENES", "CLUSTER_GENES")
+INFO [2022-02-07 18:54:44] 
