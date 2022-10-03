@@ -1,0 +1,5 @@
+﻿SampleID,Condition,Replicate,bamReads,Peaks,PeakCaller
+AW1,Pantr2KO,1,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/outs/AW1.bam,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/peaks/AW1_peaks.narrowPeak,narrowPeak
+AX3,Pantr2KO,2,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/outs/AX3.bam,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/peaks/AX3_peaks.narrowPeak,narrowPeak
+AW4,WT,1,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/outs/AW4.bam,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/peaks/AW4_peaks.narrowPeak,narrowPeak
+AW2,WT,2,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/outs/AW2.bam,~/../../mnt/eaf1a9cf-cc6b-46fa-93fe-84e542c18e56/ATACseq-Pantr2_Neurospheres/jaugust7_153844/peaks/AW2_peaks.narrowPeak,narrowPeak
